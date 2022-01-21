@@ -1,0 +1,1 @@
+python3 /home/benito/vision_transformer/keras/mlp_mixer_imagenet_pretrain_embeddings.py /media/scratch/data/birds/train/ /home/benito/vision_transformer/experiments/pretrained_mixer_embeddings_all.npy 
