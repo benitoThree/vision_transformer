@@ -14,7 +14,7 @@ train_data_path = sys.argv[2]
 print("train_data_path:", train_data_path)
 
 npy_save_file = sys.argv[3]
-print("npy_save_file:", npy_save_file)
+print("npy_save_file:", npy_save_file + ".npy")
 
 # MLP Block
 def MlpBlock(input_dim: int, hidden_dim: int, pretrained_params, inputs):
@@ -184,7 +184,7 @@ for batch in train_data:
     outputs = np.append(outputs, new_output, 0)
     print(outputs.shape)
 
-np.save("intermediate_" + npy_save_file, outputs)
+np.save(npy_save_file + "_intermediate.npy", outputs)
 
 expected_n_images_after_datagen = outputs.shape[0]
 
@@ -196,4 +196,4 @@ for batch in datagen.flow(x_train, y_train, batch_size=batch_size):
     outputs = np.append(outputs, new_output, 0)
     print(outputs.shape)
 
-np.save(npy_save_file, outputs)
+np.save(npy_save_file + ".npy", outputs)
