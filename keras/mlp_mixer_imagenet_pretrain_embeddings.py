@@ -109,9 +109,6 @@ def MlpMixer(
     outputs = tf.keras.layers.GlobalAveragePooling1D(data_format="channels_last")(h)
     return tf.keras.Model(inputs, outputs)
 
-model = MlpMixer(filter_size, img_shape, n_channels, n_embedding_channels, n_classes, n_mixer_blocks, token_mixer_hidden_dim, channel_mixer_hidden_dim, pretrained_params=params)
-
-params = np.load(pretrained_path, allow_pickle=True)[()]
 
 filter_size = 16
 n_channels = 3
@@ -177,6 +174,8 @@ datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     vertical_flip=True,
     )
 
+params = np.load(pretrained_path, allow_pickle=True)[()]
+model = MlpMixer(filter_size, img_shape, n_channels, n_embedding_channels, n_classes, n_mixer_blocks, token_mixer_hidden_dim, channel_mixer_hidden_dim, pretrained_params=params)
 
 outputs = np.ndarray([0, n_embedding_channels])
 for batch in train_data:
