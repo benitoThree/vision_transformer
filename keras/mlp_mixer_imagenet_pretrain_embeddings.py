@@ -181,14 +181,18 @@ outputs = np.ndarray([0, n_embedding_channels])
 for batch in train_data:
     x = (batch[0] - 127.5) / 127.5
     new_output = model(x)
-    print(new_output.shape)
     outputs = np.append(outputs, new_output, 0)
     print(outputs.shape)
 
+np.save("intermediate_" + npy_save_file, outputs)
+
+expected_n_images_after_datagen = outputs.shape[0]
+
 for batch in datagen.flow(x_train, y_train, batch_size=batch_size):
+    if outputs.shape[0] >= expected_n_images_after_datagen :
+        break
     x = (batch[0] - 127.5) / 127.5
     new_output = model(x)
-    print(new_output.shape)
     outputs = np.append(outputs, new_output, 0)
     print(outputs.shape)
 
