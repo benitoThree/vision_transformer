@@ -8,10 +8,13 @@ import os
 import tensorflow.keras.layers.experimental.preprocessing as preprocessing
 
 pretrained_path = sys.argv[1]
+print("pretrained_path:", pretrained_path)
 
 train_data_path = sys.argv[2]
+print("train_data_path:", train_data_path)
 
 npy_save_file = sys.argv[3]
+print("npy_save_file:", npy_save_file)
 
 # MLP Block
 def MlpBlock(input_dim: int, hidden_dim: int, pretrained_params, inputs):
