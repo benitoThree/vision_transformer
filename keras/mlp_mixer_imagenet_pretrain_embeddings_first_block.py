@@ -166,7 +166,7 @@ model = MlpMixer(filter_size, img_shape, n_channels, n_embedding_channels, n_mix
 model.summary() # Sanity check
 
 def embed(embedding_model, dataset, save_file):
-    with open(save_file) as out:
+    with open(save_file, "w") as out:
         for batch in dataset:
             examples, labels = batch
             x = (examples - 127.5) / 127.5
@@ -181,7 +181,7 @@ embed(model, test_data, test_csv_save_file)
 def sanity_check_csv_file(dataset, csv_file):
     failed = False
     line_count = 0
-    for line in open(csv_file):
+    for line in open(csv_file, "r"):
         line_count += 1
         line_split = line.split(',')
         line_label = int(line_split[0])
