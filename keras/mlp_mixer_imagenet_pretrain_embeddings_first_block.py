@@ -163,7 +163,7 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
 params = np.load(pretrained_path, allow_pickle=True)[()]
 model = MlpMixer(filter_size, img_shape, n_channels, n_embedding_channels, n_mixer_blocks, token_mixer_hidden_dim, channel_mixer_hidden_dim, pretrained_params=params)
 
-model.Summary() # Sanity check
+model.summary() # Sanity check
 
 def embed(embedding_model, dataset, save_file):
     with open(save_file) as out:
