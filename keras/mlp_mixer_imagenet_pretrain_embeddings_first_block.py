@@ -172,8 +172,7 @@ def embed(embedding_model, dataset, save_file):
             x = (examples - 127.5) / 127.5
             batch_embeddings = embedding_model(x)
             for i, embedding in enumerate(batch_embeddings):
-                print(embedding)
-                out.write(f'{labels[i]},' + ','.join(embedding))
+                out.write(f'{labels[i]},' + ','.join(["{:.2f}".format(elem) for elem in embedding]))
 
 embed(model, train_data, train_csv_save_file)
 embed(model, test_data, test_csv_save_file)
