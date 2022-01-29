@@ -172,22 +172,22 @@ else:
 
 
 layers = [
-    bolt.LayerConfig(dim=49152, load_factor=0.1,
+    bolt.LayerConfig(dim=49152, load_factor=0.05,
                          activation_function="ReLU",
                          sampling_config=bolt.SamplingConfig(
-                             hashes_per_table=6, num_tables=128,
-                             range_pow=6 * 3, reservoir_size=128)),
-    bolt.LayerConfig(dim=49152, load_factor=0.1,
-                         activation_function="ReLU",
-                         sampling_config=bolt.SamplingConfig(
-                             hashes_per_table=6, num_tables=128,
-                             range_pow=6 * 3, reservoir_size=128)),
+                             hashes_per_table=4, num_tables=64,
+                             range_pow=4 * 3, reservoir_size=64)),
+    bolt.LayerConfig(dim=768, load_factor=1,
+                         activation_function="ReLU"),
+                         # sampling_config=bolt.SamplingConfig(
+                            # hashes_per_table=6, num_tables=128,
+                            # range_pow=6 * 3, reservoir_size=128)),
     bolt.LayerConfig(dim=100, load_factor=1,
                         activation_function="Softmax")
 ]
 network = bolt.Network(layers=layers, input_dim=49152)
 
 for i in range(10):
-    network.loadAndTrain(bolt_train_examples, bolt_train_labels, 512, 0.001, 1, rehash=3000, rebuild=10000)
+    network.loadAndTrain(bolt_train_examples, bolt_train_labels, 256, 0.001, 1, rehash=3000, rebuild=10000)
     acc = network.loadAndPredict(bolt_test_examples, bolt_test_labels, 64)
     print(f"Epoch {i + 1}: {acc}")
