@@ -21,7 +21,7 @@ print("test_data_path:", test_data_path)
 save_file = "/home/benito/vision_transformer/experiments/embeddings/pretrained_patches_100"
 train_save_file = save_file + "_train"
 test_save_file = save_file + "_test"
-print(f"csv_save_files: {train_save_file} and {test_save_file}")
+print(f"npy_save_files: {train_save_file} and {test_save_file}")
 
 def PatchAndProject(n_channels: int, patch_width: int, pretrained_params, inputs):
     conv = tf.keras.layers.Conv2D(n_channels, patch_width, strides=patch_width) 
@@ -154,10 +154,22 @@ def embed(embedding_model, dataset, save_file, batch_size, stop_after=None):
     np.save(save_file + "_labels", image_labels)
     return image_patch_embeddings, image_labels
 
-bolt_test_examples, bolt_test_labels = embed(model, test_data, test_save_file, batch_size)
-bolt_train_examples, bolt_train_labels = embed(model, train_data, train_save_file, batch_size, stop_after=57880)
+if os.path.exists(test_save_file + "_embeddings.npy" and test_save_file + "_labels.npy"):
+    bolt_test_examples = np.load(test_save_file + "_embeddings.npy")
+    bolt_test_labels = np.load(test_save_file + "_labels.npy")
+    print("Loaded test embeddings")
+else:
+    bolt_test_examples, bolt_test_labels = embed(model, test_data, test_save_file, batch_size)
+    print("Embedded test dataset")
 
-print("Done embedding!")
+if os.path.exists(train_save_file + "_embeddings.npy" and train_save_file + "_labels.npy"):
+    bolt_train_examples = np.load(train_save_file + "_embeddings.npy")
+    bolt_train_labels = np.load(train_save_file + "_labels.npy")
+    print("Loaded train embeddings")
+else:
+    bolt_train_examples, bolt_train_labels = embed(model, train_data, train_save_file, batch_size, stop_after=57880)
+    print("Embedded train dataset")
+
 
 layers = [
     bolt.LayerConfig(dim=49152, load_factor=0.01,
