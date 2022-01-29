@@ -171,6 +171,31 @@ else:
     print("Embedded train dataset")
 
 
+# MLP Block
+def MlpBlock(input_dim: int, hidden_dim: int):
+    return tf.keras.Sequential([
+        tf.keras.layers.Dense(hidden_dim, activation='gelu'),
+        tf.keras.layers.Dense(input_dim)
+    ])
+
+# Mixer Block
+def MixerBlock(n_tokens: int, n_channels: int, token_mixer_hidden_dim: int, channel_mixer_hidden_dim, inputs):
+    # inputs = tf.keras.Input(shape=(n_channels, n_tokens))
+    y = tf.keras.layers.LayerNormalization()(inputs); 
+    y = tf.keras.layers.Permute((2, 1))(y)
+    # batch_size = y.shape[0]
+    y = tf.reshape(y, (-1, n_tokens))
+    y = MlpBlock(n_tokens, token_mixer_hidden_dim)(y)
+    y = tf.reshape(y, (-1, n_channels, n_tokens))
+    y = tf.keras.layers.Permute((2, 1))(y)
+    x = tf.keras.layers.Add()([inputs, y])
+    y = tf.keras.layers.LayerNormalization()(x); 
+    y = tf.reshape(y, (-1, n_channels))
+    y = MlpBlock(n_channels, channel_mixer_hidden_dim)(y)
+    y = tf.reshape(y, (-1, n_tokens, n_channels))
+    outputs = tf.keras.layers.Add()([x, y])
+    return outputs
+
 def MlpMixer(patch_width: int, image_width: int, n_input_channels: int, n_channels: int, n_classes: int, n_mixer_blocks: int, token_mixer_hidden_dim: int, channel_mixer_hidden_dim: int):
     n_patches_side = int(image_width // patch_width)
     n_patches = int(n_patches_side ** 2)
