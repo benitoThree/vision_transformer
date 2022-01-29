@@ -175,7 +175,7 @@ def MlpMixer(patch_width: int, image_width: int, n_input_channels: int, n_channe
     n_patches_side = int(image_width // patch_width)
     n_patches = int(n_patches_side ** 2)
     inputs = tf.keras.layers.Input([n_patches * n_channels])
-    h = tf.reshape(h, (-1, n_patches, n_channels))
+    h = tf.reshape(inputs, (-1, n_patches, n_channels))
     for i in range(n_mixer_blocks):
         h = MixerBlock(n_patches, n_channels, token_mixer_hidden_dim, channel_mixer_hidden_dim, h)
     h = tf.keras.layers.LayerNormalization()(h)
