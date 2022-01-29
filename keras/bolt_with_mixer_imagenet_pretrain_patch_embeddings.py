@@ -172,12 +172,12 @@ else:
 
 
 layers = [
-    bolt.LayerConfig(dim=49152, load_factor=0.01,
+    bolt.LayerConfig(dim=49152, load_factor=0.1,
                          activation_function="ReLU",
                          sampling_config=bolt.SamplingConfig(
                              hashes_per_table=6, num_tables=128,
                              range_pow=6 * 3, reservoir_size=128)),
-    bolt.LayerConfig(dim=49152, load_factor=0.01,
+    bolt.LayerConfig(dim=49152, load_factor=0.1,
                          activation_function="ReLU",
                          sampling_config=bolt.SamplingConfig(
                              hashes_per_table=6, num_tables=128,
