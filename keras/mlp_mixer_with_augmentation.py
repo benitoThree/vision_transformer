@@ -62,14 +62,14 @@ def MlpMixer(patch_width: int, image_width: int, n_input_channels: int, n_channe
     ##########
     return tf.keras.Model(inputs, outputs)
 
-def get_train_datagen_flow(train_data_path, n_train_examples, batch_size, image_width):
-    train_data = tf.keras.preprocessing.image_dataset_from_directory(
-        directory=train_data_path,
+def get_datagen_flow(data_path, n_examples, batch_size, image_width):
+    data = tf.keras.preprocessing.image_dataset_from_directory(
+        directory=data_path,
         labels="inferred",
         label_mode="int",
         class_names=None,
         color_mode="rgb",
-        batch_size=n_train_examples,
+        batch_size=n_examples,
         image_size=(image_width, image_width),
         shuffle=True,
         seed=None,
@@ -80,8 +80,8 @@ def get_train_datagen_flow(train_data_path, n_train_examples, batch_size, image_
         crop_to_aspect_ratio=False,
     )
 
-    for batch in train_data:
-        x_train, y_train = batch
+    for batch in data:
+        x_data, y_data = batch
 
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         # samplewise_center=True,
@@ -97,13 +97,13 @@ def get_train_datagen_flow(train_data_path, n_train_examples, batch_size, image_
         vertical_flip=True,
         )
 
-    datagen.fit(x_train)
+    datagen.fit(x_data)
     
-    return datagen.flow(x_train, y_train, batch_size=batch_size)
+    return datagen.flow(x_data, y_data, batch_size=batch_size)
 
-def get_test_data(test_data_path, batch_size, image_width):
-    test_data = tf.keras.preprocessing.image_dataset_from_directory(
-        directory="/media/scratch/data/birds/test/",
+def get_dataset(data_path, batch_size, image_width):
+    data = tf.keras.preprocessing.image_dataset_from_directory(
+        directory=data_path,
         labels="inferred",
         label_mode="int",
         class_names=None,
@@ -119,7 +119,7 @@ def get_test_data(test_data_path, batch_size, image_width):
         crop_to_aspect_ratio=False,
     )
 
-    return test_data
+    return data
 
 class Logger(object):
     def __init__(self, logfile_path):
@@ -141,7 +141,7 @@ def run_experiment(
     n_train_examples,
     test_data_path,
     n_classes,
-    checkpoint_path,
+    save_path,
     logfile_path,
     n_mixer_blocks=2,
     token_mixer_hidden_dim=384,
@@ -151,13 +151,19 @@ def run_experiment(
     image_width=128,
     patch_width=16,
     patch_embedding_dim=768,
-    patch_embedding_hidden_dim=0
+    patch_embedding_hidden_dim=0,
+    n_epochs=100,
     ):
 
     sys.stdout = Logger(logfile_path)
 
-    train_datagen_flow = get_train_datagen_flow(train_data_path, n_train_examples, batch_size, image_width)
-    test_data = get_test_data(test_data_path, batch_size, image_width)
+    if n_train_examples <= 100000:
+        train_data = get_datagen_flow(train_data_path, n_train_examples, batch_size, image_width)
+    else:
+        train_data = get_dataset(train_data_path, batch_size, image_width)
+
+    if test_data_path:
+        test_data = get_dataset(test_data_path, batch_size, image_width)
 
     model = MlpMixer(
         patch_width, 
@@ -172,9 +178,9 @@ def run_experiment(
         )
 
     # Create a callback that saves the model's weights
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                    save_weights_only=True,
-                                                    verbose=1)
+    # cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+    #                                                 save_weights_only=True,
+    #                                                 verbose=1)
 
     model.compile(
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), 
@@ -182,7 +188,13 @@ def run_experiment(
         metrics=[keras.metrics.SparseCategoricalAccuracy()],
         )
 
-    for epoch in range(100):
-        model.fit(train_datagen_flow, callbacks=[cp_callback])
-        _, acc = model.evaluate(test_data)
-        print(f"Epoch {epoch + 1}: accuracy {acc}.")
+    model.summary()
+
+    for epoch in range(n_epochs):
+        model.fit(train_data)
+        print("Saving... Do not interrupt the program.")
+        model.save(save_path)
+        print(f"Saved to {save_path}")
+        if test_data_path:
+            _, acc = model.evaluate(test_data)
+            print(f"Epoch {epoch + 1}: accuracy {acc}.")
