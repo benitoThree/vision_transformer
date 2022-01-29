@@ -171,7 +171,7 @@ else:
     print("Embedded train dataset")
 
 
-def MlpMixer(patch_width: int, image_width: int, n_input_channels: int, n_channels: int, n_classes: int, n_mixer_blocks: int, token_mixer_hidden_dim: int, channel_mixer_hidden_dim: int, patch_embedding_hidden_dim: int):
+def MlpMixer(patch_width: int, image_width: int, n_input_channels: int, n_channels: int, n_classes: int, n_mixer_blocks: int, token_mixer_hidden_dim: int, channel_mixer_hidden_dim: int):
     n_patches_side = int(image_width // patch_width)
     n_patches = int(n_patches_side ** 2)
     inputs = tf.keras.layers.Input([n_patches * n_channels])
